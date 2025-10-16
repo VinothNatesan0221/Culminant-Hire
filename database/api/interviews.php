@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/config.php';
 
 ini_set('display_errors', 1);
@@ -16,7 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/config.php';
 
-function sendResponse($success, $data = null, $message = '') {
+function sendResponse($success, $data = null, $message = '')
+{
     echo json_encode([
         'success' => $success,
         'data' => $data,
@@ -68,7 +70,7 @@ try {
 
         case 'update':
             $id = $input['id'] ?? '';
-            
+
             if (empty($id)) {
                 sendResponse(false, null, 'Interview ID is required');
             }
@@ -76,7 +78,7 @@ try {
             $updateFields = [];
             $params = [];
 
-            $fields = ['candidateId' => 'candidate_id', 'candidateName' => 'candidate_name', 
+            $fields = ['candidateId' => 'candidate_id', 'candidateName' => 'candidate_name',
                       'jobCode' => 'job_code', 'client' => 'client', 'interviewDate' => 'interview_date',
                       'interviewTime' => 'interview_time', 'interviewType' => 'interview_type',
                       'interviewer' => 'interviewer', 'candidateMobile' => 'candidate_mobile',
@@ -121,4 +123,3 @@ try {
 } catch (Exception $e) {
     sendResponse(false, null, 'Database error: ' . $e->getMessage());
 }
-?>

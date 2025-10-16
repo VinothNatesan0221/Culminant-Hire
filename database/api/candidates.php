@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/config.php';
 
 ini_set('display_errors', 1);
@@ -24,15 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/config.php';
 
-class CandidatesAPI {
+class CandidatesAPI
+{
     private $db;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $database = new Database();
         $this->db = $database->connect();
     }
-    
-    public function getAllCandidates() {
+
+    public function getAllCandidates()
+    {
         try {
             $stmt = $this->db->query("
                 SELECT c.*, u1.name as recruiter_name, u2.name as am_name 
@@ -42,14 +46,15 @@ class CandidatesAPI {
                 ORDER BY c.created_at DESC
             ");
             $candidates = $stmt->fetchAll();
-            
+
             return ['success' => true, 'data' => $candidates];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
-    
-    public function getCandidate($id) {
+
+    public function getCandidate($id)
+    {
         try {
             $stmt = $this->db->prepare("
                 SELECT c.*, u1.name as recruiter_name, u2.name as am_name 
@@ -60,7 +65,7 @@ class CandidatesAPI {
             ");
             $stmt->execute([$id]);
             $candidate = $stmt->fetch();
-            
+
             if ($candidate) {
                 return ['success' => true, 'data' => $candidate];
             } else {
@@ -70,8 +75,9 @@ class CandidatesAPI {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
-    
-    public function createCandidate($data) {
+
+    public function createCandidate($data)
+    {
         try {
             $stmt = $this->db->prepare("
                 INSERT INTO candidates (
@@ -82,7 +88,7 @@ class CandidatesAPI {
                     recruiter_id, am_id
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            
+
             $stmt->execute([
                 $data['name'], $data['email'], $data['mobile'],
                 $data['current_location'] ?? '', $data['work_location'] ?? '',
@@ -94,11 +100,11 @@ class CandidatesAPI {
                 $data['status_details'] ?? '', $data['remarks'] ?? '',
                 $data['recruiter_id'] ?? null, $data['am_id'] ?? null
             ]);
-            
+
             $candidateId = $this->db->lastInsertId();
-            
+
             return [
-                'success' => true, 
+                'success' => true,
                 'message' => 'Candidate created successfully',
                 'candidate_id' => $candidateId
             ];
@@ -106,42 +112,45 @@ class CandidatesAPI {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
-    
-    public function updateCandidate($id, $data) {
+
+    public function updateCandidate($id, $data)
+    {
         try {
             $fields = [];
             $values = [];
-            
+
             foreach ($data as $key => $value) {
                 if ($key !== 'id') {
                     $fields[] = "$key = ?";
                     $values[] = $value;
                 }
             }
-            
+
             $values[] = $id;
-            
+
             $stmt = $this->db->prepare("UPDATE candidates SET " . implode(', ', $fields) . " WHERE id = ?");
             $stmt->execute($values);
-            
+
             return ['success' => true, 'message' => 'Candidate updated successfully'];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
-    
-    public function deleteCandidate($id) {
+
+    public function deleteCandidate($id)
+    {
         try {
             $stmt = $this->db->prepare("DELETE FROM candidates WHERE id = ?");
             $stmt->execute([$id]);
-            
+
             return ['success' => true, 'message' => 'Candidate deleted successfully'];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
-    
-    public function searchCandidates($query) {
+
+    public function searchCandidates($query)
+    {
         try {
             $searchTerm = "%$query%";
             $stmt = $this->db->prepare("
@@ -154,7 +163,7 @@ class CandidatesAPI {
             ");
             $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
             $candidates = $stmt->fetchAll();
-            
+
             return ['success' => true, 'data' => $candidates];
         } catch (PDOException $e) {
             return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
@@ -178,11 +187,11 @@ switch ($method) {
             echo json_encode($candidatesAPI->getAllCandidates());
         }
         break;
-        
+
     case 'POST':
         echo json_encode($candidatesAPI->createCandidate($input));
         break;
-        
+
     case 'PUT':
         $id = $input['id'] ?? null;
         if ($id) {
@@ -191,7 +200,7 @@ switch ($method) {
             echo json_encode(['success' => false, 'message' => 'ID required for update']);
         }
         break;
-        
+
     case 'DELETE':
         $id = $input['id'] ?? $_GET['id'] ?? null;
         if ($id) {
@@ -200,8 +209,7 @@ switch ($method) {
             echo json_encode(['success' => false, 'message' => 'ID required for delete']);
         }
         break;
-        
+
     default:
         echo json_encode(['success' => false, 'message' => 'Method not allowed']);
 }
-?>

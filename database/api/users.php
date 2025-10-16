@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/config.php';
 
 ini_set('display_errors', 1);
@@ -19,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/config.php';
 
-function sendResponse($success, $data = null, $message = '') {
+function sendResponse($success, $data = null, $message = '')
+{
     echo json_encode([
         'success' => $success,
         'data' => $data,
@@ -28,7 +30,8 @@ function sendResponse($success, $data = null, $message = '') {
     exit;
 }
 
-function hashPassword($password) {
+function hashPassword($password)
+{
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
@@ -136,4 +139,3 @@ try {
 } catch (Exception $e) {
     sendResponse(false, null, 'Database error: ' . $e->getMessage());
 }
-?>

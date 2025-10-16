@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database Configuration for Hostinger MySQL
  * Recruitment Management System
@@ -12,7 +13,8 @@ define('DB_PASS', 'CuLmInAnT@123'); // Replace with your MySQL password
 define('DB_CHARSET', 'utf8mb4');
 
 // Database connection class
-class Database {
+class Database
+{
     private $host = DB_HOST;
     private $db_name = DB_NAME;
     private $username = DB_USER;
@@ -20,9 +22,10 @@ class Database {
     private $charset = DB_CHARSET;
     private $pdo;
 
-    public function connect() {
+    public function connect()
+    {
         $this->pdo = null;
-        
+
         try {
             $dsn = "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=" . $this->charset;
             $options = [
@@ -30,13 +33,13 @@ class Database {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ];
-            
+
             $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
-            
-        } catch(PDOException $e) {
+
+        } catch (PDOException $e) {
             echo "Connection Error: " . $e->getMessage();
         }
-        
+
         return $this->pdo;
     }
 }
@@ -46,13 +49,14 @@ $database = new Database();
 $pdo = $database->connect();
 
 // Test connection function
-function testConnection() {
+function testConnection()
+{
     $database = new Database();
     $db = $database->connect();
-    
+
     if ($db) {
         echo "✅ Database connection successful!<br>";
-        
+
         // Test query
         try {
             $stmt = $db->query("SELECT COUNT(*) as user_count FROM users");
@@ -68,4 +72,3 @@ function testConnection() {
 
 // Uncomment the line below to test connection
 // testConnection();
-?>
